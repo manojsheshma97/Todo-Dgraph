@@ -1,25 +1,39 @@
-import logo from './logo.svg';
+import React from 'react'
+import { Router, Switch } from "react-router-dom";
+
+import ApolloClient from "apollo-client";
+import { InMemoryCache } from "apollo-cache-inmemory";
+import { ApolloProvider } from "@apollo/react-hooks";
+import { createHttpLink } from "apollo-link-http";
+
+import TodoApp from "./TodoApp";
+//import config from "./config.json";
 import './App.css';
 
-function App() {
+const createApolloClient = () => {
+  const httpLink = createHttpLink({
+    uri: 'https://patient-voice.us-east-1.aws.cloud.dgraph.io/graphql',
+    options: {
+      reconnect: true,
+    },
+  });
+
+  return new ApolloClient({
+    link: httpLink,
+    cache: new InMemoryCache()
+  });
+}
+
+const App = () => {
+  const client = createApolloClient();
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <ApolloProvider client={client}>
+      <div>
+        <h1>todos</h1>
+        <TodoApp />
     </div>
+    </ApolloProvider>
   );
 }
 
-export default App;
+export default App
